@@ -377,7 +377,7 @@ fun! s:DoSrcSafe(bang, count, cmd, ... )
     endwhile
   elseif a:cmd=~?'\<S\%[tatus]\>'         " S^tatus
     while i <= c
-      call confirm( s:GetStatus(f{i}, 0, 1, 1)) 
+      echo s:GetStatus(f{i}, 0, 1, 1)
       let i=i+1
     endwhile
   elseif a:cmd=~?'\<Sum\%[mary]\>'        " Sum^mary

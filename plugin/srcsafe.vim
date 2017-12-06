@@ -905,7 +905,7 @@ fun! s:DoHistoryWithSyntax(filename)
   setlocal modifiable
   1,$d
 
-  exec '.r !""'.g:ssExecutable.'" History "'.prjfile.'""'
+  exec '.r !"'.g:ssExecutable.'" History "'.prjfile.'"'
   set nomodified
   setlocal nomodifiable
   call s:HistorySyntax()

@@ -484,7 +484,11 @@ fun! s:UpdateSimilar(filename, extras)
 endfun
 fun! s:system(cmd,args)
 "  echo '+'.a:cmd.'+'.a:args.'+'
-  return system('""'.a:cmd.'" '.a:args.'"')
+  let result=system('"'.a:cmd.'" '.a:args)
+  if has('iconv')
+    let result=iconv(result, 'cp932', &encoding)
+  endif
+  return result
 endfun
 
 fun! s:SSUpdate( filename, copyold, extras)

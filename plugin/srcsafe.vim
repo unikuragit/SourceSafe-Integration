@@ -1215,7 +1215,10 @@ function! s:GetStatus(filename, include_brief, ShowExtra, ShowAllLocks)
         if is_dir 
           let file = substitute(matchstr(sMatch, '^.\{18}'),'\s*$','','') 
         endif
-        let sUser = matchstr(sMatch, ' \@<=\w\+')
+        let sUser = matchstr(sMatch, ' \@<=[^\x01-\x7e]\+')   " for japanese
+        if strlen(sUser) == 0
+          let sUser = matchstr(sMatch, ' \@<=\w\+')
+        endif
         let bExclusive = match(sMatch,'\w\+\s\+\w\+\s\+Exc') > -1
         let bIsMe = sUser ==? g:ssUserName
         let sOld = matchstr(sMatch,'\(\w\+\s\+\w\+\s\+v\)\@<=\d\+')

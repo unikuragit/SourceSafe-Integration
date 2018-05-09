@@ -348,7 +348,7 @@ fun! s:DoSrcSafe(bang, count, cmd, ... )
   elseif a:cmd=~?'\<U\%[pdate]\>'         " U^pdate
     while i <= c
       if s:CheckWrite(f{i})
-        call s:SSUpdate( f{i}, '', '')      
+        call s:SSUpdate( f{i}, '', '', a:bang)
         call s:UpdateStatusFor( f{i}, 0 )
       endif
       let i=i+1
@@ -401,7 +401,7 @@ fun! s:DoSrcSafe(bang, count, cmd, ... )
   elseif a:cmd=~?'\<UpdateL\%[ocked]\>'   " UpdateL^ocked
     while i <= c
       if s:CheckWrite(f{i})
-        call s:SSUpdate( f{i}, '', '-K')
+        call s:SSUpdate( f{i}, '', '-K', a:bang)
         call s:UpdateStatusFor( f{i}, 0 )
       endif
       let i=i+1
@@ -477,9 +477,9 @@ fun! s:UpdateSimilar(filename, extras)
 "  let res = confirm("Reuse comment:\n\n".comment,"&Yes\n&No\n&Edit",1)
   let res = confirm("Reuse comment:\n\n".comment,"&Yes\n&No\n&Edit",1)
   if res ==1
-    call s:SSUpdate( a:filename, 'r', a:extras)
+    call s:SSUpdate( a:filename, 'r', a:extras, '')
   elseif res==3
-    call s:SSUpdate( a:filename, 'e', a:extras)
+    call s:SSUpdate( a:filename, 'e', a:extras, '')
   endif
 endfun
 fun! s:system(cmd,args)
@@ -491,7 +491,11 @@ fun! s:system(cmd,args)
   return result
 endfun
 
-fun! s:SSUpdate( filename, copyold, extras)
+fun! s:SSUpdate( filename, copyold, extras, bang)
+  if a:bang == '!'
+    call s:SSCmd('Update '.a:extras.' -C- ', a:filename,0, 'o')
+    return
+  endif
   call s:CheckTemp()
   if filereadable(s:commenttmp)
     call rename(s:commenttmp,s:commenttmp.'.1')

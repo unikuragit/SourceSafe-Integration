@@ -500,15 +500,20 @@ fun! s:SSUpdate( filename, copyold, extras, bang)
   if filereadable(s:commenttmp)
     call rename(s:commenttmp,s:commenttmp.'.1')
   endif
+  if executable('gvim')
+    let vimpath = 'gvim.exe'
+  else
+    let vimpath = $VIMRUNTIME.'\gvim.exe'
+  endif
   if a:copyold=='e'
     " Bring up the old comment to be edited
-    call s:system($VIMRUNTIME.'\gvim.exe','-f -u NONE -U NONE -c "set go=aiMr co=30 lines=10"  -c "set nomod" -c "silent e '.s:commenttmp.'.1" -c "silent f %:r" -c "set mod"')
+    call s:system(vimpath,'-f -u NONE -U NONE -c "set go=aiMr co=30 lines=10"  -c "set nomod" -c "silent e '.s:commenttmp.'.1" -c "silent f %:r" -c "set mod"')
   elseif a:copyold=='r'
     " Reuse the old comment
       call rename(s:commenttmp.'.1', s:commenttmp)
   else
     " Create a new comment
-    call s:system($VIMRUNTIME.'\gvim.exe',' -f -u NONE -U NONE -c "set go=aiMr co=30 lines=10" "'.s:commenttmp.'"')
+    call s:system(vimpath,' -f -u NONE -U NONE -c "set go=aiMr co=30 lines=10" "'.s:commenttmp.'"')
   endif
   if filereadable(s:commenttmp)
     let cmt=s:Cat(s:commenttmp)

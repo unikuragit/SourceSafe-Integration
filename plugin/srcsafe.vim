@@ -435,6 +435,22 @@ fun! s:DoSrcSafe(bang, count, cmd, ... )
     "endwhile
     "call input(ff)
     "call s:SSCmd('Dir'.((a:bang=='!')?' -R': ''), ff, a:count, '')
+  elseif a:cmd =~?'\<V\%[iew]\>'     " V^iew
+    call s:SSCmd('View', f{i}, a:count, 'r')
+    execute 'sp ' . s:ssredirfile
+  elseif a:cmd =~?'\<VRD\%[iff]\>'     " VRD^iff
+    if c == 2
+      let file = expand('%')
+    else
+      let file = f{i}
+      let i=i+1
+    endif
+    call s:SSCmd('View', file, f{i}, 'r')
+    let srcf = s:ssredirfile
+    let i=i+1
+    call s:SSCmd('View', file, f{i}, 'r')
+    let destf = s:ssredirfile
+    execute 'tab sp ' . srcf . '|' . 'diffsplit ' . destf
   else
       call confirm('SS: Unknown function :"'.a:cmd.'"')
   endif
@@ -815,6 +831,7 @@ fun! s:SSCmd(cmd, filename, ssVer, opts)
   let force=(a:opts=~'f')
   let hasoutput=(a:opts=~'o')
   let isdiff=(a:opts=~'d')
+  let isredirect=(a:opts=~'r')
 
   "Check for setup.
   if !s:CheckSS() | return 0 | endif
@@ -842,6 +859,17 @@ fun! s:SSCmd(cmd, filename, ssVer, opts)
 
   if isdiff
     let cmdargs=cmdargs.' "'.a:filename.'"'
+  endif
+
+  if isredirect
+    let vf = $TEMP . '\ss\' . fnamemodify(a:filename, ':t:r') . '_' . a:ssVer . '.' . fnamemodify(a:filename, ':t:e')
+    if filereadable(vf)
+      if delete(vf) == -1
+        let vf = tempname()
+      endif
+    endif
+    let cmdargs=cmdargs.' -O@' . vf
+    let s:ssredirfile = vf
   endif
 
   let autoread=&autoread
@@ -1419,6 +1447,8 @@ command! -complete=file -bang -nargs=* -count=0 SDiffSS call s:DoSrcSafe(<q-bang
 call s:addMenuMapping('&Diff', '{count}', 'sf', ':<c-u>call <SID>DoSrcSafe(0, v:count, "Diff", expand("%"))<cr>')
 command! -complete=file -bang -nargs=* -count=0 SDiff call s:DoSrcSafe(<q-bang>,<count>, 'Diff',<f-args>)
 
+command! -complete=file -nargs=+ SDiffVer call s:DoSrcSafe('', 0, 'VRDiff', <f-args>)
+
 call s:addMenuMapping('C&lose', '', 'sF', ':<c-u>call <SID>ClearDiffMode()<cr>')
 command! -nargs=0 SDiffClose call s:ClearDiffMode()
 
@@ -1445,6 +1475,8 @@ call s:addMenuMapping('-s1-', '', '', '')
 
 call s:addMenuMapping('&Explore', '','',':call <SID>SSRun("ssexp.exe")<CR>')
 call s:addMenuMapping('Admin', '','',':call <SID>SSRun("ssadmin.exe")<CR>')
+
+command! -complete=file -bang -nargs=* -count=0 SView call s:DoSrcSafe(<q-bang>,<count>, 'View',<f-args>)
 
 fun! s:SSRun( prog)
   if !s:CheckSS() | return | endif

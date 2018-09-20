@@ -438,6 +438,9 @@ fun! s:DoSrcSafe(bang, count, cmd, ... )
   elseif a:cmd =~?'\<V\%[iew]\>'     " V^iew
     call s:SSCmd('View', f{i}, a:count, 'r')
     execute 'sp ' . s:ssredirfile
+  elseif a:cmd =~?'\<SYSV\%[iew]\>'     " SYSV^iew
+    call s:SSCmd('Get', f{i}, a:count, 'rt')
+    execute '!start "' . s:ssredirfile . '"'
   elseif a:cmd =~?'\<VRD\%[iff]\>'     " VRD^iff
     if c == 2
       let file = expand('%')
@@ -832,6 +835,8 @@ fun! s:SSCmd(cmd, filename, ssVer, opts)
   let hasoutput=(a:opts=~'o')
   let isdiff=(a:opts=~'d')
   let isredirect=(a:opts=~'r')
+  let isoutputtemp=(a:opts=~'t')
+  let outfname=''
 
   "Check for setup.
   if !s:CheckSS() | return 0 | endif
@@ -862,13 +867,18 @@ fun! s:SSCmd(cmd, filename, ssVer, opts)
   endif
 
   if isredirect
-    let vf = $TEMP . '\ss\' . fnamemodify(a:filename, ':t:r') . '_' . a:ssVer . '.' . fnamemodify(a:filename, ':t:e')
+    let vf = $TEMP . '\ss\' . fnamemodify(a:filename, ':t:r') . '_v' . a:ssVer . '.' . fnamemodify(a:filename, ':t:e')
     if filereadable(vf)
       if delete(vf) == -1
         let vf = tempname()
       endif
     endif
-    let cmdargs=cmdargs.' -O@' . vf
+    if isoutputtemp
+      let outfname=fnamemodify(vf, ':h') . (has('win32') ? '\' : '/'). fnamemodify(a:filename, ':t')
+      let cmdargs=cmdargs.' -GL"' . fnamemodify(vf, ':h') . '"'
+    else
+      let cmdargs=cmdargs.' -O@' . vf
+    endif
     let s:ssredirfile = vf
   endif
 
@@ -894,6 +904,14 @@ fun! s:SSCmd(cmd, filename, ssVer, opts)
         " Successful - finish.
         "echo a:cmd.' -I-N '.cmdargs
         call s:Success(res)
+        if isoutputtemp
+          if has('win32')
+            echomsg outfname
+            call system('move "' . outfname . '" "' . s:ssredirfile . '"')
+          else
+            call system('mv ''' . outfname . ''' ''' . s:ssredirfile . '''')
+          endif
+        endif
         return 1
       else
         " Answer the questions
@@ -1477,6 +1495,7 @@ call s:addMenuMapping('&Explore', '','',':call <SID>SSRun("ssexp.exe")<CR>')
 call s:addMenuMapping('Admin', '','',':call <SID>SSRun("ssadmin.exe")<CR>')
 
 command! -complete=file -bang -nargs=* -count=0 SView call s:DoSrcSafe(<q-bang>,<count>, 'View',<f-args>)
+command! -complete=file -bang -nargs=* -count=0 SSYSView call s:DoSrcSafe(<q-bang>,<count>, 'SYSView',<f-args>)
 
 fun! s:SSRun( prog)
   if !s:CheckSS() | return | endif

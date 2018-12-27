@@ -967,10 +967,85 @@ fun! s:DoHistoryWithSyntax(filename)
   exec '.r !"'.g:ssExecutable.'" History "'.prjfile.'"'
   set nomodified
   setlocal nomodifiable
+  exec 'lcd ' . fnamemodify(a:filename, ':p:h')
   call s:HistorySyntax()
+  call s:HistoryKeyMap()
   1
 endfun
 
+fun! s:HistoryKeyMap()
+  nnoremap <buffer> <leader>v :call <SID>OpenVer()<CR>
+  nnoremap <buffer> <leader>g :call <SID>GetVer()<CR>
+  nnoremap <buffer> <leader>df :call <SID>DiffFrom()<CR>
+  nnoremap <buffer> <leader>ds :call <SID>DiffTo()<CR>
+  nnoremap <buffer> <leader>dd :call <SID>DiffVerHistory()<CR>
+  nnoremap <buffer> g? :echo "<lt>leader>v  :Open specified version\n<lt>leader>g  :Checkout specified version\n<lt>leader>df :Diff first\n<lt>leader>ds :Diff second\n<lt>leader>dd :Diff\n"<CR>
+endfun
+
+fun! s:GetFileVerOnHistory()
+  let curdir=getcwd()
+  let projdir=s:CheckDirForFile(curdir,'.project')
+  let proj=projdir.'.project'
+  let ssfilecont=s:Cat(proj)
+  let ssfile=substitute(ssfilecont,"^[  \n\r]*".'\(.\{-}\)'."[  \n\r]*$",'\1','')
+
+  let tdir = iconv(' のリストを作成しています。.*', 'utf-8', &l:fenc)
+  let tfil = iconv(' の履歴.*', 'utf-8', &l:fenc)
+  let type = 0
+  let target = getline(2)
+  let line = search('^\*\*\*', 'bcn')
+  if target =~? tdir
+    let vline = line + 1
+    let type = 0
+    let file = substitute(target, tdir, '', '') . '/' . substitute(getline(line), '\*\{5}  \|  \*\{5}', '', 'g')
+    let ver = substitute(getline(vline), 'バージョン ', '', '') + 0
+  elseif target =~? tfil
+    let vline = line
+    let type = 1
+    let file = substitute(target, tfil, '', '')
+    let ver = substitute(getline(vline), '\*\{17}  バージョン \|  \*\{17}', '', 'g') + 0
+  endif
+  let file = substitute(file, escape(ssfile, '$'), projdir, '')
+  return {'file' : file, 'version' : ver, 'version_line' : vline}
+endfun
+
+fun! s:DiffVerHistory() abort
+  call s:SSCmd('Get', b:sdiff_from.file, b:sdiff_from.version, 'rt')
+  let first = s:ssredirfile
+  call s:SSCmd('Get', b:sdiff_to.file, b:sdiff_to.version, 'rt')
+  let second = s:ssredirfile
+  execute 'tab sp ' . first . '|' . 'diffsplit ' . second
+endfun
+
+fun! s:OpenVer()
+  let fileInfo = s:GetFileVerOnHistory()
+  match none
+  execute 'match error ' . '/\%' . fileInfo.version_line . 'l/'
+  call s:SSCmd('Get', fileInfo.file, fileInfo.version, 'rt')
+  execute 'sp ' . s:ssredirfile
+endfun
+
+fun! s:GetVer()
+  let fileInfo = s:GetFileVerOnHistory()
+  match none
+  execute 'match error ' . '/\%' . fileInfo.version_line . 'l/'
+  call s:SSCmd('Get -R ', fileInfo.file, fileInfo.version, 'o')
+  call s:UpdateStatusFor( fileInfo.file, 0 )
+endfun
+
+fun! s:DiffFrom()
+  let b:sdiff_from = s:GetFileVerOnHistory()
+  echo b:sdiff_from
+  2match none
+  execute '2match difftext ' . '/\%' . b:sdiff_from.version_line . 'l/'
+endfun
+
+fun! s:DiffTo()
+  let b:sdiff_to = s:GetFileVerOnHistory()
+  echo b:sdiff_to
+  3match none
+  execute '3match diffadd ' . '/\%' . b:sdiff_to.version_line . 'l/'
+endfun
 
 fun! s:DoCheckedOutFiles(bang, ...)
     let bang=a:bang.'' =='!'

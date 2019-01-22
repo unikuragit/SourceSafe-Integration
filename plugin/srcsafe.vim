@@ -390,6 +390,11 @@ fun! s:DoSrcSafe(bang, count, cmd, ... )
       call s:DoHistoryWithSyntax( f{i})
       let i=i+1
     endwhile
+  elseif a:cmd=~?'\<RH\%[istory]\>'       " RH^istory
+    while i <= c
+      call s:DoHistoryWithSyntax( f{i}, '-R')
+      let i=i+1
+    endwhile
   elseif a:cmd=~?'\<A\%[dd]\>'            " A^dd
     while i <= c
       if s:CheckWrite(f{i})
@@ -936,7 +941,7 @@ fun! s:SSCmd(cmd, filename, ssVer, opts)
   return 1
 endfun
 
-fun! s:DoHistoryWithSyntax(filename)
+fun! s:DoHistoryWithSyntax(filename, ...)
 
   if !s:CheckSS() | return | endif
 
@@ -945,6 +950,9 @@ fun! s:DoHistoryWithSyntax(filename)
      echoerr 'Invalid project'
      return
   endif
+
+  let opt = ''
+  if a:0 > 0 | let opt = a:1 | endif
 
   let bname='History!'.fnamemodify(a:filename,':t:gs/ \./_/')
   let hbufnr=bufnr(bname)
@@ -964,7 +972,7 @@ fun! s:DoHistoryWithSyntax(filename)
   setlocal modifiable
   1,$d
 
-  exec '.r !"'.g:ssExecutable.'" History "'.prjfile.'"'
+  exec '.r !"'.g:ssExecutable.'" History "'.prjfile.'" '.opt
   set nomodified
   setlocal nomodifiable
   exec 'lcd ' . fnamemodify(a:filename, ':p:h')
@@ -1571,6 +1579,7 @@ call s:addMenuMapping('Admin', '','',':call <SID>SSRun("ssadmin.exe")<CR>')
 
 command! -complete=file -bang -nargs=* -count=0 SView call s:DoSrcSafe(<q-bang>,<count>, 'View',<f-args>)
 command! -complete=file -bang -nargs=* -count=0 SSYSView call s:DoSrcSafe(<q-bang>,<count>, 'SYSView',<f-args>)
+command! -complete=file -bang -nargs=* -count=0 SRHistory call s:DoSrcSafe(<q-bang>,<count>, 'RHistory',<f-args>)
 
 fun! s:SSRun( prog)
   if !s:CheckSS() | return | endif

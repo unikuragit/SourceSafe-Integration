@@ -1005,7 +1005,7 @@ fun! s:GetFileVerOnHistory()
   if target =~? tdir
     let vline = line + 1
     let type = 0
-    let file = substitute(target, tdir, '', '') . '/' . substitute(getline(line), '\*\{5}  \|  \*\{5}', '', 'g')
+    let file = substitute(getline(vline+2), 'チェックイン ', '', '') . '/' . substitute(getline(line), '\*\{5}  \|  \*\{5}', '', 'g')
     let ver = substitute(getline(vline), 'バージョン ', '', '') + 0
   elseif target =~? tfil
     let vline = line

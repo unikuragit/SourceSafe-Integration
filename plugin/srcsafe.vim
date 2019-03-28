@@ -996,22 +996,28 @@ fun! s:GetFileVerOnHistory()
   let proj=projdir.'.project'
   let ssfilecont=s:Cat(proj)
   let ssfile=substitute(ssfilecont,"^[  \n\r]*".'\(.\{-}\)'."[  \n\r]*$",'\1','')
-
-  let tdir = iconv(' のリストを作成しています。.*', 'utf-8', &l:fenc)
   let tfil = iconv(' の履歴.*', 'utf-8', &l:fenc)
-  let type = 0
-  let target = getline(2)
+
   let line = search('^\*\*\*', 'bcn')
-  if target =~? tdir
+  if line == 0
+    echoerr 'History not found.'
+    return
+  endif
+  if getline(line+1) =~ '^バージョン\s\+\d\+$'
     let vline = line + 1
     let type = 0
     let file = substitute(getline(vline+2), 'チェックイン ', '', '') . '/' . substitute(getline(line), '\*\{5}  \|  \*\{5}', '', 'g')
     let ver = substitute(getline(vline), 'バージョン ', '', '') + 0
-  elseif target =~? tfil
-    let vline = line
+  else
     let type = 1
-    let file = substitute(target, tfil, '', '')
+    let vline = line
     let ver = substitute(getline(vline), '\*\{17}  バージョン \|  \*\{17}', '', 'g') + 0
+    if  getline(line+2) =~ '^チェックイン\s\+.\+$'
+      let target = getline(2)
+      let file = substitute(target, tfil, '', '')
+    else
+      let file = substitute(getline(vline+2), '^\(.*\)\sを.*$', '\1', '')
+    endif
   endif
   let file = substitute(file, escape(ssfile, '$'), projdir, '')
   return {'file' : file, 'version' : ver, 'version_line' : vline}

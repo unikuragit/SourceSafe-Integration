@@ -987,7 +987,8 @@ fun! s:HistoryKeyMap()
   nnoremap <buffer> <leader>df :call <SID>DiffFrom()<CR>
   nnoremap <buffer> <leader>ds :call <SID>DiffTo()<CR>
   nnoremap <buffer> <leader>dd :call <SID>DiffVerHistory()<CR>
-  nnoremap <buffer> g? :echo "<lt>leader>v  :Open specified version\n<lt>leader>g  :Checkout specified version\n<lt>leader>df :Diff first\n<lt>leader>ds :Diff second\n<lt>leader>dd :Diff\n"<CR>
+  nnoremap <buffer> D :call <SID>DiffPrevVerHistory()<CR>
+  nnoremap <buffer> g? :echo "<lt>leader>v  :Open specified version\n<lt>leader>g  :Checkout specified version\n<lt>leader>df :Diff first\n<lt>leader>ds :Diff second\n<lt>leader>dd :Diff\nD :Diff previous version\n"<CR>
 endfun
 
 fun! s:GetFileVerOnHistory()
@@ -1023,12 +1024,30 @@ fun! s:GetFileVerOnHistory()
   return {'file' : file, 'version' : ver, 'version_line' : vline}
 endfun
 
-fun! s:DiffVerHistory() abort
-  call s:SSCmd('Get', b:sdiff_from.file, b:sdiff_from.version, 'rt')
+fun! s:DiffVerHistory(...) abort
+  if a:0 > 1
+    let from = a:1
+    let to = a:2
+  else
+    let from = b:sdiff_from
+    let to = b:sdiff_to
+  endif
+  call s:SSCmd('Get', from.file, from.version, 'rt')
   let first = s:ssredirfile
-  call s:SSCmd('Get', b:sdiff_to.file, b:sdiff_to.version, 'rt')
+  call s:SSCmd('Get', to.file, to.version, 'rt')
   let second = s:ssredirfile
   execute 'tab sp ' . first . '|' . 'diffsplit ' . second
+endfun
+
+fun! s:DiffPrevVerHistory() abort
+  let cur = s:GetFileVerOnHistory()
+  let prev = deepcopy(cur)
+  if prev.version - 1 < 1
+    echoerr 'Nothing previous version.'
+    return
+  endif
+  let prev.version -= 1
+  call s:DiffVerHistory(prev, cur)
 endfun
 
 fun! s:OpenVer()

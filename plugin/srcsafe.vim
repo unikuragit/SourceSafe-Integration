@@ -621,7 +621,12 @@ fun! s:GetSSFile( filename )
     let buftype= getbufvar(bufnr, '&buftype')
     if buftype != '' && buftype != 'nowrite' | return '' | endif
   endif
-      
+
+  return s:GetSSFilePhysical(a:filename)
+
+endfun
+
+fun! s:GetSSFilePhysical( filename )
   let fname=fnamemodify(a:filename,':p:gs+\\+/+')
   let projdir=s:CheckDirForFile(fnamemodify(fname, ':h'),'.project')
   if projdir==''
@@ -1617,7 +1622,7 @@ call s:addMenuMapping('Admin', '','',':call <SID>SSRun("ssadmin.exe")<CR>')
 command! -complete=file -bang -nargs=* -count=0 SView call s:DoSrcSafe(<q-bang>,<count>, 'View',<f-args>)
 command! -complete=file -bang -nargs=* -count=0 SSYSView call s:DoSrcSafe(<q-bang>,<count>, 'SYSView',<f-args>)
 command! -complete=file -bang -nargs=* -count=0 SRHistory call s:DoSrcSafe(<q-bang>,<count>, 'RHistory',<f-args>)
-command! -complete=file -nargs=1 SProjectPath echo s:GetSSFile(<f-args>)
+command! -complete=file -nargs=1 SProjectPath echo s:GetSSFilePhysical(<f-args>)
 
 fun! s:SSRun( prog)
   if !s:CheckSS() | return | endif

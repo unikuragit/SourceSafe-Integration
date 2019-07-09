@@ -997,7 +997,7 @@ fun! s:GetFileVerOnHistory()
   let proj=projdir.'.project'
   let ssfilecont=s:Cat(proj)
   let ssfile=substitute(ssfilecont,"^[  \n\r]*".'\(.\{-}\)'."[  \n\r]*$",'\1','')
-  let tfil = iconv(' の履歴.*', 'utf-8', &l:fenc)
+  let tfil = iconv(' の\(履歴\|リストを作成しています\).*', 'utf-8', &l:fenc)
 
   let line = search('^\*\*\*', 'bcn')
   if line == 0
@@ -1007,7 +1007,15 @@ fun! s:GetFileVerOnHistory()
   if getline(line+1) =~ '^バージョン\s\+\d\+$'
     let vline = line + 1
     let type = 0
-    let file = substitute(getline(vline+2), 'チェックイン ', '', '') . '/' . substitute(getline(line), '\*\{5}  \|  \*\{5}', '', 'g')
+    let fline = getline(vline+2)
+    if fline =~ '^チェックイン '
+      let file = substitute(fline, 'チェックイン ', '', '') . '/' . substitute(getline(line), '\*\{5}  \|  \*\{5}', '', 'g')
+    elseif fline =~ '^作成'
+      let target = getline(2)
+      let file = substitute(target, tfil, '', '')
+    else
+      let file = "Unknown"
+    endif
     let ver = substitute(getline(vline), 'バージョン ', '', '') + 0
   else
     let type = 1
@@ -1016,8 +1024,12 @@ fun! s:GetFileVerOnHistory()
     if  getline(line+2) =~ '^チェックイン\s\+.\+$'
       let target = getline(2)
       let file = substitute(target, tfil, '', '')
+    elseif getline(line+2) =~ '^作成'
+      let target = getline(2)
+      let file = substitute(target, tfil, '', '')
     else
-      let file = substitute(getline(vline+2), '^\(.*\)\sを.*$', '\1', '')
+      let parent = getline(2)
+      let file = substitute(parent, tfil, '', '') . '/' . substitute(getline(vline+2), '^\(.*\)\sを追加$', '\1', '')
     endif
   endif
   let file = substitute(file, escape(ssfile, '$'), projdir, '')
@@ -1605,6 +1617,7 @@ call s:addMenuMapping('Admin', '','',':call <SID>SSRun("ssadmin.exe")<CR>')
 command! -complete=file -bang -nargs=* -count=0 SView call s:DoSrcSafe(<q-bang>,<count>, 'View',<f-args>)
 command! -complete=file -bang -nargs=* -count=0 SSYSView call s:DoSrcSafe(<q-bang>,<count>, 'SYSView',<f-args>)
 command! -complete=file -bang -nargs=* -count=0 SRHistory call s:DoSrcSafe(<q-bang>,<count>, 'RHistory',<f-args>)
+command! -complete=file -nargs=1 SProjectPath echo s:GetSSFile(<f-args>)
 
 fun! s:SSRun( prog)
   if !s:CheckSS() | return | endif

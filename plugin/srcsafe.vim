@@ -985,7 +985,10 @@ fun! s:DoHistoryWithSyntax(filename, ...)
   exec '.r !"'.g:ssExecutable.'" History "'.prjfile.'" '.opt
   set nomodified
   setlocal nomodifiable
-  exec 'lcd ' . fnamemodify(a:filename, ':p:h')
+  let fpath = fnamemodify(a:filename, ':p:h')
+  if filereadable(fpath)
+    exec 'lcd ' . fpath
+  endif
   call s:HistorySyntax()
   call s:HistoryKeyMap()
   1
@@ -996,9 +999,19 @@ fun! s:HistoryKeyMap()
   nnoremap <buffer> <leader>g :call <SID>GetVer()<CR>
   nnoremap <buffer> <leader>df :call <SID>DiffFrom()<CR>
   nnoremap <buffer> <leader>ds :call <SID>DiffTo()<CR>
+  nnoremap <buffer> <leader>dc :call <SID>DiffClear(getcurpos[1])<CR>
+  nnoremap <buffer> <leader>dac :call <SID>DiffClear(0)<CR>
   nnoremap <buffer> <leader>dd :call <SID>DiffVerHistory()<CR>
   nnoremap <buffer> D :call <SID>DiffPrevVerHistory()<CR>
-  nnoremap <buffer> g? :echo "<lt>leader>v  :Open specified version\n<lt>leader>g  :Checkout specified version\n<lt>leader>df :Diff first\n<lt>leader>ds :Diff second\n<lt>leader>dd :Diff\nD :Diff previous version\n"<CR>
+  nnoremap <buffer> g? :echo join([
+      \ "<lt>leader>v  : Open specified version",
+      \ "<lt>leader>g  : Checkout specified version",
+      \ "<lt>leader>df : Diff first",
+      \ "<lt>leader>ds : Diff second",
+      \ "<lt>leader>dc : Diff clear",
+      \ "<lt>leader>dd : Vim Diff",
+      \ "        D  : Diff previous version",
+      \ ], "\n")<CR>
 endfun
 
 fun! s:GetFileVerOnHistory()
@@ -1051,8 +1064,18 @@ fun! s:DiffVerHistory(...) abort
     let from = a:1
     let to = a:2
   else
-    let from = b:sdiff_from
-    let to = b:sdiff_to
+    let from = get(b:, 'sdiff_from', s:GetFileVerOnHistory())
+    let to = get(b:, 'sdiff_to', s:GetFileVerOnHistory())
+    if !( type(from) == v:t_dict && type(to) == v:t_dict )
+      return
+    endif
+    if  from.file == to.file && from.version == to.version
+      if to.version == 1
+        echo 'Same file version'
+        return
+      endif
+      let to.version -= 1
+    endif
   endif
   call s:SSCmd('Get', from.file, from.version, 'rt')
   let first = s:ssredirfile
@@ -1100,6 +1123,29 @@ fun! s:DiffTo()
   echo b:sdiff_to
   3match none
   execute '3match diffadd ' . '/\%' . b:sdiff_to.version_line . 'l/'
+endfun
+
+fun! s:DiffClear(lnum)
+  let lnm = a:lnum
+  if lnm <= 0
+    2match none
+    3match none
+    if exists('b:sdiff_from') | unlet b:sdiff_from | endif
+    if exists('b:sdiff_to') | unlet b:sdiff_to | endif
+  else
+    if exists('b:sdiff_from')
+      if lnm == b:sdiff_from.version_line
+        2match none
+        unlet b:sdiff_from
+      endif
+    endif
+    if exists('b:sdiff_to')
+      if lnm == b:sdiff_to.version_line
+        3match none
+        unlet b:sdiff_to
+      endif
+    endif
+  endif
 endfun
 
 fun! s:DoCheckedOutFiles(bang, ...)

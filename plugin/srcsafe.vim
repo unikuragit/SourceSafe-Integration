@@ -615,6 +615,11 @@ fun! s:GetSSFile( filename )
     return ''
   endif
 
+  " Direct project path.
+  if a:filename =~ '^\$/.*'
+    return a:filename
+  endif
+
   let bufnr=bufnr(a:filename)
   " Speedup - make sure we aren't looking at a special buffer
   if bufnr >= 0 

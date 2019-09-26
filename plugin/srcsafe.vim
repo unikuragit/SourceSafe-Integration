@@ -995,15 +995,15 @@ fun! s:DoHistoryWithSyntax(filename, ...)
 endfun
 
 fun! s:HistoryKeyMap()
-  nnoremap <buffer> <leader>v :call <SID>OpenVer()<CR>
-  nnoremap <buffer> <leader>g :call <SID>GetVer()<CR>
-  nnoremap <buffer> <leader>df :call <SID>DiffFrom()<CR>
-  nnoremap <buffer> <leader>ds :call <SID>DiffTo()<CR>
-  nnoremap <buffer> <leader>dc :call <SID>DiffClear(getcurpos[1])<CR>
-  nnoremap <buffer> <leader>dac :call <SID>DiffClear(0)<CR>
-  nnoremap <buffer> <leader>dd :call <SID>DiffVerHistory()<CR>
-  nnoremap <buffer> D :call <SID>DiffPrevVerHistory()<CR>
-  nnoremap <buffer> g? :echo join([
+  nnoremap <nowait> <buffer> <leader>v :call <SID>OpenVer()<CR>
+  nnoremap <nowait> <buffer> <leader>g :call <SID>GetVer()<CR>
+  nnoremap <nowait> <buffer> <leader>df :call <SID>DiffFrom()<CR>
+  nnoremap <nowait> <buffer> <leader>ds :call <SID>DiffTo()<CR>
+  nnoremap <nowait> <buffer> <leader>dc :call <SID>DiffClear(getcurpos()[1])<CR>
+  nnoremap <nowait> <buffer> <leader>dac :call <SID>DiffClear(0)<CR>
+  nnoremap <nowait> <buffer> <leader>dd :call <SID>DiffVerHistory()<CR>
+  nnoremap <nowait> <buffer> D :call <SID>DiffPrevVerHistory()<CR>
+  nnoremap <nowait> <buffer> g? :echo join([
       \ "<lt>leader>v  : Open specified version",
       \ "<lt>leader>g  : Checkout specified version",
       \ "<lt>leader>df : Diff first",

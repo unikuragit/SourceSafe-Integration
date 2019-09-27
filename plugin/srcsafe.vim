@@ -984,7 +984,7 @@ fun! s:DoHistoryWithSyntax(filename, ...)
 
   exec '.r !"'.g:ssExecutable.'" History "'.prjfile.'" '.opt
   set nomodified
-  setlocal nomodifiable
+  setlocal nomodifiable filetype=vss_history
   let fpath = fnamemodify(a:filename, ':p:h')
   if filereadable(fpath)
     exec 'lcd ' . fpath
@@ -997,6 +997,8 @@ endfun
 fun! s:HistoryKeyMap()
   nnoremap <nowait> <buffer> <leader>v :call <SID>OpenVer()<CR>
   nnoremap <nowait> <buffer> <leader>g :call <SID>GetVer()<CR>
+  nnoremap <nowait> <buffer> <leader>R :call <SID>Recover()<CR>
+  nnoremap <nowait> <buffer> <leader>LB :call <SID>Rollback()<CR>
   nnoremap <nowait> <buffer> <leader>df :call <SID>DiffFrom()<CR>
   nnoremap <nowait> <buffer> <leader>ds :call <SID>DiffTo()<CR>
   nnoremap <nowait> <buffer> <leader>dc :call <SID>DiffClear(getcurpos()[1])<CR>
@@ -1010,8 +1012,28 @@ fun! s:HistoryKeyMap()
       \ "<lt>leader>ds : Diff second",
       \ "<lt>leader>dc : Diff clear",
       \ "<lt>leader>dd : Vim Diff",
+      \ "<lt>leader>R  : Recover deleted file",
+      \ "<lt>leader>LB : Rollback version",
       \ "        D  : Diff previous version",
       \ ], "\n")<CR>
+endfun
+
+fun! s:Recover()
+  let fileInfo = s:GetFileVerOnHistory()
+  if fileInfo.status == 'del'
+    let answ = confirm(printf('Recover to %s:ver%d,OK? ', fileInfo.file, fileInfo.version), "&Yes\n&No", 2)
+    if answ == 2 | echo 'Canceled' | return | endif
+    call s:SSCmd('Recover -G-', fileInfo.file, 0, '')
+    echo 'Please reload history!'
+  endif
+endfun
+
+fun! s:Rollback()
+  let fileInfo = s:GetFileVerOnHistory()
+  let answ = confirm(printf('!!DENGER!! Rollback to %s:ver%d,OK? ', fileInfo.file, fileInfo.version), "&Yes\n&No", 2)
+  if answ == 2 | echo 'Canceled' | return | endif
+  call s:SSCmd('Rollback -G- -Y -V' . fileInfo.version, fileInfo.file, 0, '')
+  echo 'Please reload history!'
 endfun
 
 fun! s:GetFileVerOnHistory()
@@ -1021,6 +1043,7 @@ fun! s:GetFileVerOnHistory()
   let ssfilecont=s:Cat(proj)
   let ssfile=substitute(ssfilecont,"^[  \n\r]*".'\(.\{-}\)'."[  \n\r]*$",'\1','')
   let tfil = iconv(' の\(履歴\|リストを作成しています\).*', 'utf-8', &l:fenc)
+  let status = ''
 
   let line = search('^\*\*\*', 'bcn')
   if line == 0
@@ -1052,11 +1075,17 @@ fun! s:GetFileVerOnHistory()
       let file = substitute(target, tfil, '', '')
     else
       let parent = getline(2)
-      let file = substitute(parent, tfil, '', '') . '/' . substitute(getline(vline+2), '^\(.*\)\sを追加$', '\1', '')
+      let fline = getline(vline+2)
+      if fline =~ '\sを追加$'
+        let status = 'new'
+      elseif fline =~ '\sを削除$'
+        let status = 'del'
+      endif
+      let file = substitute(parent, tfil, '', '') . '/' . substitute(fline, '^\(.*\)\sを\(追加\|削除\)$', '\1', '')
     endif
   endif
   let file = substitute(file, escape(ssfile, '$'), projdir, '')
-  return {'file' : file, 'version' : ver, 'version_line' : vline}
+  return {'file' : file, 'version' : ver, 'version_line' : vline, 'status' : status}
 endfun
 
 fun! s:DiffVerHistory(...) abort

@@ -43,6 +43,11 @@
 " @\\file\srcsafe@$/MyProj/
 " This works by setting (& restoring) $SSDIR before calling the
 " command-line.
+"
+" More improved support for database login user and password.
+" A separate with '|'. if include '|' charactor in user-name or password, escape by '<BAR>'.
+" eg:
+" @\\file\srcsafe|user|pass<BAR>word@$/MyProj/
 " 
 " Note that in the following, you can specify a count for Get, Diff,  (checkout ??)
 " This does a get of/diff against the specified version.
@@ -653,7 +658,14 @@ fun! s:GetSSFilePhysical( filename )
   if ssfile=~'^@'
     let ssproj=substitute(ssfile,'^@\(.*\)@$.*$','\1','')
     let ssfile=substitute(ssfile,'^@.*@\ze\$','','')
-    let $SSDIR=substitute(ssproj,'\c[/\\]\k\+\.ini$','','')
+    let useropt = split(ssproj, '|')
+    if len(useropt) < 3
+      let $SSDIR=substitute(ssproj,'\c[/\\]\k\+\.ini$','','')
+    else
+      let $SSDIR=substitute(useropt[0],'\c[/\\]\k\+\.ini$','','')
+      let $SSUSER=substitute(useropt[1], '<BAR>', '|', 'g')
+      let $SSPWD=substitute(useropt[2], '<BAR>', '|', 'g')
+    endif
   else
     let $SSDIR=g:srcsafe_ssdir_orig
   endif

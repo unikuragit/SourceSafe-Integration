@@ -622,7 +622,7 @@ fun! s:GetSSFile( filename )
 
   " Direct project path.
   if a:filename =~ '^\$/.*'
-    return a:filename
+    return '"'.a:filename.'"'
   endif
 
   let bufnr=bufnr(a:filename)
@@ -643,7 +643,7 @@ fun! s:GetSSFilePhysical( filename )
     if exists('g:ssLocalTree')
       let localtree=fnamemodify( g:ssLocalTree, ':p:gs+\\+/+')
       if localtree ==? strpart( fname, 0, strlen(localtree) )
-        return '$'.strpart( fname, strlen(localtree))
+        return '"$'.strpart( fname, strlen(localtree)).'"'
       endif
     endif
     return ''
@@ -994,7 +994,7 @@ fun! s:DoHistoryWithSyntax(filename, ...)
   setlocal modifiable
   1,$d
 
-  exec '.r !"'.g:ssExecutable.'" History "'.prjfile.'" '.opt
+  exec '.r !"'.g:ssExecutable.'" History '.prjfile.' '.opt
   set nomodified
   setlocal nomodifiable filetype=vss_history
   let fpath = fnamemodify(a:filename, ':p:h')

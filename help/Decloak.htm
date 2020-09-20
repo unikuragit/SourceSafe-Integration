@@ -1,0 +1,189 @@
+﻿<html DIR="LTR" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+  <head>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=utf-8" />
+    <META NAME="save" CONTENT="history" />
+    <title>Decloak (コマンド ライン)</title>
+    <xml>
+      <MSHelp:Keyword Index="K" Term="decloak コマンド" />
+      <MSHelp:Keyword Index="K" Term="ss decloak" />
+      <MSHelp:Keyword Index="F" Term="ss_unghost" />
+      <MSHelp:Keyword Index="A" Term="04985cb8-7298-4e76-9b46-748d656a5059" />
+      <MSHelp:Attr Name="RevisionNumber" Value="4" />
+      <MSHelp:Attr Name="DocSet" Value="Visual Source Safe" />
+      <MSHelp:Attr Name="ShippedIn" Value="vs.80" />
+      <MSHelp:Attr Name="TopicType" Value="kbRef" />
+      <MSHelp:Attr Name="TopicVersion" Value="08.00.50730.10012" />
+      <MSHelp:Attr Name="Locale" Value="ja-jp" />
+      <MSHelp:Attr Name="AssetID" Value="04985cb8-7298-4e76-9b46-748d656a5059" />
+      <MSHelp:Attr Name="TopicType" Value="kbRef" />
+      <MSHelp:Attr Name="Abstract" Value="プロジェクトからクロークの属性を削除します。" />
+    </xml>
+    <link rel="stylesheet" type="text/css" href="../local/Classic.css">
+      
+    </link>
+    <link rel="stylesheet" type="text/css" href="ms-help://Hx/HxRuntime/HxLink.css">
+    </link>
+    <script src="../local/EventUtilities.js">
+      
+    </script>
+    <script src="../local/SplitScreen.js">
+      
+    </script>
+    <script src="../local/Dropdown.js">
+      
+    </script>
+    <script src="../local/script.js">
+      
+    </script>
+  </head>
+  <body>
+    <input type="hidden" id="userDataCache" class="userDataStyle">
+    </input>
+    <input type="hidden" id="hiddenScrollOffset">
+    </input>
+    <img id="dropDownImage" style="display:none; height:0; width:0;" alt="ドロップダウン" src="../local/drpdown.gif">
+      
+    </img>
+    <img id="dropDownHoverImage" style="display:none; height:0; width:0;" alt="ホバー状態のドロップダウン" src="../local/drpdown_orange.gif">
+      
+    </img>
+    <img id="collapseImage" style="display:none; height:0; width:0;" alt="縮小した状態" src="../local/collapse_all.gif">
+      
+    </img>
+    <img id="expandImage" style="display:none; height:0; width:0;" alt="展開した状態" src="../local/expand_all.gif">
+      
+    </img>
+    <img id="collapseAllImage" style="display:none; height:0; width:0;" alt="すべて縮小した状態" src="../local/collall.gif">
+      
+    </img>
+    <img id="expandAllImage" style="display:none; height:0; width:0;" alt="すべて展開した状態" src="../local/expall.gif">
+      
+    </img>
+    <img id="copyImage" style="display:none; height:0; width:0;" alt="コピー" src="../local/copycode.gif">
+      
+    </img>
+    <img id="copyHoverImage" style="display:none; height:0; width:0;" alt="ホバー状態のコピー" src="../local/copycodeHighlight.gif">
+      
+    </img>
+    <div id="header">
+      <table width="100%" id="topTable">
+        <tr id="headerTableRow1">
+          <td align="left">
+            <span id="runningHeaderText">
+              Visual SourceSafe
+            </span>
+          </td>
+        </tr>
+        <tr id="headerTableRow2">
+          <td align="left">
+            <span id="nsrTitle">Decloak (コマンド ライン)</span>
+          </td>
+        </tr>
+        <tr id="headerTableRow3">
+          <td>
+            <a href="#seeAlsoToggle" onclick="OpenSection(seeAlsoToggle)">参照</a> 
+									</td>
+        </tr>
+      </table>
+      <table width="100%" id="bottomTable" cellspacing="0" cellpadding="0">
+        <tr>
+          <td>
+            <span onclick="ExpandCollapseAll(toggleAllImage)" style="cursor:default;" onkeypress="ExpandCollapseAll_CheckKey(toggleAllImage)" tabindex="0">
+              <img ID="toggleAllImage" class="toggleAll" alt="すべて縮小した状態" src="../local/collall.gif">
+                
+              </img>
+              <label id="collapseAllLabel" for="toggleAllImage" style="display: none;">
+                すべて折りたたむ
+              </label>
+              <label id="expandAllLabel" for="toggleAllImage" style="display: none;">
+                すべて展開
+              </label> </span>
+            <span id="languageFilterToolTip" style="cursor:default;" onmouseover="languageFilterImage.src=dropDownHoverImage.src;" onmouseout="languageFilterImage.src=dropDownImage.src;" tabindex="0">
+              <img id="languageFilterImage" alt="ドロップダウン" src="../local/drpdown.gif">
+                
+              </img>
+              <label id="showAllLabel" for="languageFilterImage" style="display: none;">
+                言語のフィルタ : 
+                    すべて
+                  
+              </label>
+              <label id="multipleLabel" for="languageFilterImage" style="display: none;">
+                言語のフィルタ : 
+                    複数
+                  
+              </label>
+              <label id="vbLabel" for="languageFilterImage" style="display: none;">
+                言語のフィルタ : 
+                    Visual Basic
+                  
+              </label>
+              <label id="csLabel" for="languageFilterImage" style="display: none;">
+                言語のフィルタ : 
+                    C#
+                  
+              </label>
+              <label id="cLabel" for="languageFilterImage" style="display: none;">
+                言語のフィルタ : 
+                    C++
+                  
+              </label>
+              <label id="jsharpLabel" for="languageFilterImage" style="display: none;">
+                言語のフィルタ : 
+                    J#
+                  
+              </label>
+              <label id="jsLabel" for="languageFilterImage" style="display: none;">
+                言語のフィルタ : 
+                    JScript
+                  
+              </label>
+            </span>
+          </td>
+        </tr>
+      </table>
+      <div id="languageSpan" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+        <input type="checkbox" name="languageFilter" onClick="SetLanguage(this)" id="vbDeclarationCheckbox" />
+        <label class="languageFilter" for="vbDeclarationCheckbox">Visual Basic (宣言)</label>
+        <br />
+        <input type="checkbox" name="languageFilter" onClick="SetLanguage(this)" id="vbUsageCheckbox" />
+        <label class="languageFilter" for="vbUsageCheckbox">Visual Basic (使用法)</label>
+        <br />
+        <input type="checkbox" name="languageFilter" onClick="SetLanguage(this)" id="csCheckbox" />
+        <label class="languageFilter" for="csCheckbox">C#</label>
+        <br />
+        <input type="checkbox" name="languageFilter" onClick="SetLanguage(this)" id="cCheckbox" />
+        <label class="languageFilter" for="cCheckbox">C++</label>
+        <br />
+        <input type="checkbox" name="languageFilter" onClick="SetLanguage(this)" id="jsharpCheckbox" />
+        <label class="languageFilter" for="jsharpCheckbox">J#</label>
+        <br />
+        <input type="checkbox" name="languageFilter" onClick="SetLanguage(this)" id="jsCheckbox" />
+        <label class="languageFilter" for="jsCheckbox">JScript</label>
+        <br />
+      </div>
+    </div>
+    <div id="mainSection">
+      <div id="mainBody">
+        <div id="allHistory" class="saveHistory" onsave="saveAll()" onload="loadAll()">
+        </div>
+        <font color="DarkGray"></font><p />
+<p>プロジェクトからクロークの属性を削除します。 </p>
+  <h1 class="heading"><span onclick="ExpandCollapse(sectionToggle0)" style="cursor:default;" onkeypress="ExpandCollapse_CheckKey(sectionToggle0)" tabindex="0"><img id="sectionToggle0" onload="OnLoadImage()" class="toggle" name="toggleSwitch" alt="展開した状態" src="../local/expand_all.gif"></img>構文</span></h1><div id="sectionSection0" class="section" name="collapseableSection" style="display: none;">
+      <div class="code"><span codeLanguage="other"><table width="100%" cellspacing="0" cellpadding="0"><tr><th> </th><th><span class="copyCode" onclick="CopyCode(this)" onkeypress="CopyCode_CheckKey(this)" onmouseover="ChangeCopyCodeIcon(this)" onmouseout="ChangeCopyCodeIcon(this)" tabindex="0"><img class="copyCodeImage" name="ccImage" align="absmiddle" alt="コードのコピー" src="../local/copycode.gif"></img>コードのコピー</span></th></tr><tr><td colspan="2"><pre>ss Decloak &lt;project&gt;</pre></td></tr></table></span></div>
+    </div><h1 class="heading"><span onclick="ExpandCollapse(sectionToggle1)" style="cursor:default;" onkeypress="ExpandCollapse_CheckKey(sectionToggle1)" tabindex="0"><img id="sectionToggle1" onload="OnLoadImage()" class="toggle" name="toggleSwitch" alt="展開した状態" src="../local/expand_all.gif"></img>プロジェクト権限</span></h1><div id="sectionSection1" class="section" name="collapseableSection" style="display: none;">
+<p>このコマンドは、すべての Visual SourceSafe ユーザーが使用できます。</p>
+    </div><h1 class="heading"><span onclick="ExpandCollapse(sectionToggle2)" style="cursor:default;" onkeypress="ExpandCollapse_CheckKey(sectionToggle2)" tabindex="0"><img id="sectionToggle2" onload="OnLoadImage()" class="toggle" name="toggleSwitch" alt="展開した状態" src="../local/expand_all.gif"></img>例</span></h1><div id="sectionSection2" class="section" name="collapseableSection" style="display: none;">
+<p>$/Word/Code プロジェクトのクロークを解除します。</p>
+      <div class="code"><span codeLanguage="other"><table width="100%" cellspacing="0" cellpadding="0"><tr><th> </th><th><span class="copyCode" onclick="CopyCode(this)" onkeypress="CopyCode_CheckKey(this)" onmouseover="ChangeCopyCodeIcon(this)" onmouseout="ChangeCopyCodeIcon(this)" tabindex="0"><img class="copyCodeImage" name="ccImage" align="absmiddle" alt="コードのコピー" src="../local/copycode.gif"></img>コードのコピー</span></th></tr><tr><td colspan="2"><pre>ss Decloak $/Word/Code</pre></td></tr></table></span></div>
+    </div><h1 class="heading"><span onclick="ExpandCollapse(seeAlsoToggle)" style="cursor:default;" onkeypress="ExpandCollapse_CheckKey(seeAlsoToggle)" tabindex="0"><img id="seeAlsoToggle" onload="OnLoadImage()" class="toggle" name="toggleSwitch" alt="展開した状態" src="../local/expand_all.gif"></img>参照</span></h1><div id="seeAlsoSection" class="section" name="collapseableSection" style="display: none;"><h4 class="subHeading">関連項目</h4><a href="61b331e1-a4a8-479b-a08d-967d585d5470.htm">Cloak (コマンド ライン)</a><br /><h4 class="subHeading">その他の技術情報</h4><a href="d192a494-986a-446b-922c-fa1845b7da28.htm">コマンド ラインのコマンド</a><br /><a href="7ffe2701-8ab6-4d7e-b589-3d7df4069e48.htm">コマンド オプション</a><br /><br /></div></div>
+      <div id="footer">
+        <div class="footerLine">
+          <img alt="フッター" width="100%" height="3px" src="../local/footer.gif">
+            
+          </img>
+        </div>
+        このトピックについてのご提案や障害報告をお送りいただく場合は、<a href="http://go.microsoft.com/fwlink/?linkid=53178">こちら</a>を参照してください。
+      </div>
+    </div>
+  </body>
+</html>
